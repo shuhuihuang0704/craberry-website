@@ -1942,12 +1942,18 @@
         scrollOriginTime = 0;
         heroPointerActive = false;
         homeIntroPlaying = false;
+        if (hasHeroPointerPosition) {
+          setHeroPointerTarget(lastHeroPointerX, 'mouse');
+        }
         scheduleRender();
         startHomePlayback();
       }
 
-      addEventListener('pageshow', restartHomeAnimation, { passive: true });
-      addEventListener('load', restartHomeAnimation, { once: true, passive: true });
+      addEventListener('pageshow', event => {
+        // The initial page load is already initialized by video metadata.
+        // Reset only when the browser restores this page from its back/forward cache.
+        if (event.persisted) restartHomeAnimation();
+      }, { passive: true });
 
       let pendingPageTarget = '';
       let pageTransitionLocked = false;
@@ -2573,6 +2579,12 @@
         pointerTime = 0;
         scrollOriginTime = 0;
 
+        // Metadata can arrive after the user's first mouse movement. Restore
+        // that position here so startup never erases the active hero frame.
+        if (hasHeroPointerPosition && isHeroAtHome()) {
+          setHeroPointerTarget(lastHeroPointerX, 'mouse');
+        }
+
         body.classList.add('page-ready');
         startHomePlayback();
         scheduleRender();
@@ -2585,6 +2597,10 @@
           metadataCount += 1;
           configureVideo();
         }, { once: true });
+      });
+      mainVideo.addEventListener('loadedmetadata', () => {
+        if (pendingSeekTime !== null) flushVideoSeek();
+        scheduleRender();
       });
       mainVideo.addEventListener('error', () => body.classList.add('has-media-error', 'page-ready'));
 
