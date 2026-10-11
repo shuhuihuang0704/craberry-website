@@ -1,0 +1,24 @@
+{
+  "name": "craberry-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "node scripts/build-content.mjs",
+    "check": "npm run typecheck && npm test -- --run"
+  },
+  "dependencies": {
+    "@sanity/client": "^7.11.0",
+    "@sanity/image-url": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "esbuild": "^0.25.0",
+    "jsdom": "^26.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  },
+  "cmsBuildOutput": "content-runtime.js"
+}

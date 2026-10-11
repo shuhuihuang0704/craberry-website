@@ -1,0 +1,7 @@
+node_modules/
+sanity-studio/node_modules/
+sanity-studio/dist/
+.env
+sanity-studio/.env
+content-runtime.js
+content-runtime.js.map
