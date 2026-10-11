@@ -1198,13 +1198,125 @@
     @media (prefers-reduced-motion: reduce) {
       .github-gallery-page, .github-gallery-tile, .github-gallery-media img, .github-gallery-close, .github-gallery-actions button, .github-gallery-tile a, .github-gallery-tile a::after { transition: none !important; }
     }
+
+    /* Small-screen biography and portfolio layouts: keep each chapter viewport-sized,
+       but let dense copy scroll inside its own panel instead of being clipped. */
+    @media (max-width: 760px) {
+      .resume-feature {
+        --mobile-copy-top: max(68px, calc(env(safe-area-inset-top) + 42px));
+        --mobile-action-clearance: max(70px, calc(env(safe-area-inset-bottom) + 58px));
+        padding-top: var(--mobile-copy-top);
+        padding-bottom: var(--mobile-action-clearance);
+      }
+      .resume-feature-copy {
+        width: min(88vw, 420px);
+        height: calc(100svh - var(--mobile-copy-top) - var(--mobile-action-clearance) - 8px);
+        min-height: 0;
+        max-height: none;
+        padding: 0 0 12px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(196, 212, 125, .58) transparent;
+        transform: none;
+      }
+      .resume-feature-kicker { margin-bottom: 12px; font-size: 9px; letter-spacing: .16em; }
+      .resume-feature-copy h2 { max-width: 10ch; margin-bottom: 14px; font-size: clamp(42px, 11.5vw, 54px); line-height: .84; }
+      .resume-feature-copy > p { max-width: 36ch; font-size: 13px; line-height: 1.65; }
+      .resume-feature-list {
+        display: flex;
+        flex: 0 0 auto;
+        flex-direction: column;
+        gap: 14px;
+        min-height: 0;
+        margin-top: 18px;
+        padding-top: 14px;
+        overflow: visible;
+      }
+      .resume-timeline {
+        position: relative;
+        top: auto;
+        left: auto;
+        order: 1;
+        flex: 0 0 auto;
+        width: 100%;
+        height: clamp(250px, 36svh, 320px);
+        min-height: 250px;
+        max-height: none;
+        padding: 0 8px 8px 20px;
+      }
+      .resume-timeline.is-wheel article {
+        width: calc(100% - 4px);
+        padding: 12px 12px 14px 18px;
+        background: rgba(37, 39, 29, .32);
+      }
+      .resume-timeline time { font-size: clamp(34px, 9vw, 42px); white-space: nowrap; }
+      .resume-timeline strong { font-size: 12px; line-height: 1.45; }
+      .resume-timeline p { font-size: 13px; line-height: 1.55; }
+      .resume-honors {
+        order: 2;
+        flex: 0 0 auto;
+        width: 100%;
+        height: auto;
+        max-height: none;
+        align-self: stretch;
+        overflow: visible;
+        padding: 14px 0 10px;
+        border: 0;
+        border-top: 1px solid rgba(244, 234, 212, .22);
+      }
+      .resume-honors > strong { font-size: 11px; }
+      .resume-honors p { margin: 6px 0 14px; font-size: 11px; line-height: 1.65; }
+      .resume-feature .page-next { bottom: max(10px, calc(env(safe-area-inset-bottom) + 8px)); min-height: 46px; }
+
+      .resume-study {
+        padding: max(86px, calc(env(safe-area-inset-top) + 56px)) 8vw max(74px, calc(env(safe-area-inset-bottom) + 62px));
+      }
+      .resume-study-corner-note { top: max(12px, calc(env(safe-area-inset-top) + 8px)); left: 8vw; gap: 3px; }
+      .resume-study-corner-note strong { font-size: 15px; }
+      .resume-study-side-note { display: none; }
+      .resume-study-intro { top: clamp(104px, 15svh, 134px); right: 8vw; left: 8vw; width: auto; text-align: left; }
+      .resume-study-intro small { margin-bottom: 8px; font-size: 9px; letter-spacing: .16em; }
+      .resume-study-intro h2 { max-width: 12ch; margin-bottom: 8px; font-size: clamp(34px, 9.5vw, 44px); line-height: .92; }
+      .resume-study-intro p { max-width: 36ch; margin: 0 0 8px; font-size: 12px; line-height: 1.55; }
+      .resume-study-intro em { padding: 5px 8px; font-size: 9px; }
+      .resume-study-photo { right: -14vw; bottom: -2%; width: 112vw; opacity: .82; }
+      .resume-study:not(.is-portfolio-open) .resume-study-folder {
+        top: clamp(292px, 49svh, 360px);
+        right: auto;
+        bottom: auto;
+        left: 50%;
+        width: min(82vw, 344px);
+        transform: translateX(-50%);
+      }
+      .resume-study-meta { left: 8vw; bottom: max(74px, calc(env(safe-area-inset-bottom) + 66px)); width: 84vw; }
+      .resume-study-meta strong { font-size: clamp(15px, 4vw, 18px); }
+      .resume-study-meta p { font-size: 11px; line-height: 1.55; }
+      .resume-study.is-portfolio-open .resume-study-folder {
+        top: auto;
+        right: auto;
+        bottom: max(70px, calc(env(safe-area-inset-bottom) + 62px));
+        left: 50%;
+        width: 94vw;
+        transform: translateX(-50%);
+      }
+      .resume-study-cards { top: 48%; width: 94vw; height: 56svh; }
+      .portfolio-card-hit { width: clamp(128px, 36vw, 154px); }
+      .resume-study-popup-label { top: max(20px, calc(env(safe-area-inset-top) + 10px)); left: 8vw; }
+      .resume-study-popup-note { right: 8vw; bottom: max(78px, calc(env(safe-area-inset-bottom) + 70px)); width: 84vw; }
+      .portfolio-repo-panel { width: 84vw; max-height: 35svh; overflow-y: auto; }
+      .portfolio-repo-panel--app { left: 8vw; bottom: max(74px, calc(env(safe-area-inset-bottom) + 66px)); }
+      .portfolio-repo-panel--skill { right: 8vw; bottom: max(74px, calc(env(safe-area-inset-bottom) + 66px)); }
+      .resume-study .page-next { bottom: max(12px, calc(env(safe-area-inset-bottom) + 8px)); min-height: 46px; }
+    }
   </style>
 </head>
 <body>
   <main id="top" class="experience" aria-label="滚动驱动的设计师作品集介绍">
     <div class="video-stage" aria-hidden="true">
-      <video id="mainVideo" class="video-layer" muted playsinline preload="metadata" src="main-video.mp4"></video>
-      <video id="outroVideo" class="video-layer" loop muted playsinline preload="metadata" src="main-video.mp4"></video>
+      <video id="mainVideo" class="video-layer" muted playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5-page" disablepictureinpicture preload="metadata" src="main-video.mp4"></video>
+      <video id="outroVideo" class="video-layer" loop muted playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5-page" disablepictureinpicture preload="metadata" src="main-video.mp4"></video>
     </div>
 
     <canvas id="glowCursor" class="glow-cursor-canvas" aria-hidden="true"></canvas>
@@ -1270,7 +1382,7 @@
   <div class="page-transition" aria-hidden="true">
     <div id="pageTransitionComputerBackground" class="page-transition-background" aria-hidden="true"></div>
     <div id="pageTransitionFallingBackground" class="page-transition-background" aria-hidden="true"></div>
-    <video id="pageTransitionVideo" muted playsinline preload="none" data-src="custom-transition-web.mp4"></video>
+    <video id="pageTransitionVideo" muted playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5-page" disablepictureinpicture preload="none" data-src="custom-transition-web.mp4"></video>
     <div class="page-transition-character-layer" aria-hidden="true">
       <img id="pageTransitionPerson" src="person-sofa-cutout.png" alt="">
       <img id="pageTransitionFallingPerson" src="falling-foreground-cutout.png" alt="">
