@@ -1633,6 +1633,8 @@
       const TRANSITION_SPLIT_TIME = 5.8;
       const COMPUTER_SETTLED_TIME = TRANSITION_SPLIT_TIME * .60;
       const TRANSITION_END_TIME = 8;
+      const PAGE_TRANSITION_LOAD_TIMEOUT = 12000;
+      const PAGE_TRANSITION_STALL_TIMEOUT = 4000;
       const PAGE_TRANSITION_SEGMENTS = [
         // custom-transition.mp4: introduction into the computer hold.
         { from: '#page-1', to: '#page-2', start: 0, end: COMPUTER_SETTLED_TIME, motion: { start: .78, end: 1 }, align: { start: { x: 0, y: 0, scale: 1.00 }, end: { x: 20, y: 30, scale: .70 } } },
@@ -2002,6 +2004,8 @@
 
         pageTransitionVideoLoadPromise = new Promise((resolve, reject) => {
           const cleanup = () => {
+            window.clearTimeout(pageTransitionLoadTimer);
+            pageTransitionLoadTimer = 0;
             pageTransitionVideo.removeEventListener('loadedmetadata', handleLoadedMetadata);
             pageTransitionVideo.removeEventListener('error', handleError);
           };
@@ -2011,11 +2015,17 @@
           };
           const handleError = () => {
             cleanup();
+            pageTransitionVideoLoadPromise = null;
             reject(pageTransitionVideo.error || new Error('Transition video failed to load.'));
           };
 
           pageTransitionVideo.addEventListener('loadedmetadata', handleLoadedMetadata);
           pageTransitionVideo.addEventListener('error', handleError);
+          pageTransitionLoadTimer = window.setTimeout(() => {
+            cleanup();
+            pageTransitionVideoLoadPromise = null;
+            reject(new Error('Transition video metadata timed out.'));
+          }, PAGE_TRANSITION_LOAD_TIMEOUT);
           pageTransitionVideo.src = source;
           pageTransitionVideo.load();
         });
@@ -2067,6 +2077,23 @@
       let pendingPageTarget = '';
       let pageTransitionLocked = false;
       let activeTransitionSegment = null;
+      let pageTransitionLoadTimer = 0;
+      let pageTransitionPlaybackTimer = 0;
+
+      function clearPageTransitionWatchdogs() {
+        window.clearTimeout(pageTransitionLoadTimer);
+        window.clearTimeout(pageTransitionPlaybackTimer);
+        pageTransitionLoadTimer = 0;
+        pageTransitionPlaybackTimer = 0;
+      }
+
+      function armPageTransitionPlaybackWatchdog() {
+        window.clearTimeout(pageTransitionPlaybackTimer);
+        pageTransitionPlaybackTimer = window.setTimeout(() => {
+          pageTransitionPlaybackTimer = 0;
+          finishPageTransition();
+        }, PAGE_TRANSITION_STALL_TIMEOUT);
+      }
 
       function setPageThreePhase(phase) {
         videoPlaying = phase === 'videoPlaying';
@@ -2419,6 +2446,7 @@
 
       function finishPageTransition() {
         if (!pageTransitionLocked) return;
+        clearPageTransitionWatchdogs();
         const target = pendingPageTarget;
         const segment = activeTransitionSegment;
         if (target === '#page-3' && segment?.from === '#page-2' && segment?.to === '#page-3' && !pageTransitionVideo.error && pageTransitionVideo.readyState >= 1) {
@@ -2438,6 +2466,11 @@
         const page = navigatePageTarget(target);
         if (!page) return;
         setPageThreePhase('idle');
+        if (target === '#top') {
+          restartHomeAnimation();
+          history.replaceState(null, '', '#top');
+          return;
+        }
         animatePageEntry(page);
       }
 
@@ -2470,6 +2503,7 @@
           pageTransition.setAttribute('aria-hidden', 'false');
           startTransitionFrameLoop();
           const promise = pageTransitionVideo.play();
+          armPageTransitionPlaybackWatchdog();
           if (promise) promise.catch(finishPageTransition);
         }).catch(finishPageTransition);
       }
@@ -2479,6 +2513,7 @@
       pageTransitionVideo.addEventListener('error', finishPageTransition);
       pageTransitionVideo.addEventListener('timeupdate', () => {
         if (!pageTransitionLocked || !activeTransitionSegment || videoTailHold || pageThreeReveal || pageThreeInteractive) return;
+        armPageTransitionPlaybackWatchdog();
         updateTransitionAlignment();
         if (pageTransitionVideo.currentTime >= activeTransitionSegment.end) {
           pageTransitionVideo.currentTime = activeTransitionSegment.end;
