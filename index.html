@@ -1928,9 +1928,6 @@
 
       function restartHomeAnimation() {
         resetHomeView();
-        mainVideo.pause();
-        mainVideo.load();
-        mainVideo.currentTime = 0;
         targetScrollProgress = 0;
         scrollProgress = 0;
         targetVideoTime = 0;
@@ -2103,6 +2100,7 @@
 
       function activateHomeLoopBridge() {
         if (!loopHomePage || !loopHomeVideoStage || loopHomeSnapIndex < 1) return false;
+        cancelPendingVideoSeek();
         homeLoopBridgeActive = true;
         heroPointerActive = false;
         loopHomePage.classList.add('is-loop-active');
@@ -2519,6 +2517,19 @@
         scheduleRender();
       }
 
+      function cancelPendingVideoSeek() {
+        pendingSeekTime = null;
+        seekInFlight = false;
+        seekSequence += 1;
+        if (seekFrameRequest && typeof mainVideo.cancelVideoFrameCallback === 'function') {
+          mainVideo.cancelVideoFrameCallback(seekFrameRequest);
+        }
+        seekFrameRequest = 0;
+        window.clearTimeout(seekFallbackTimer);
+        seekFallbackTimer = 0;
+        lastSeekAt = 0;
+      }
+
       function flushVideoSeek() {
         if (pendingSeekTime === null || seekInFlight || mainVideo.seeking || mainVideo.readyState < 1) return;
         const now = performance.now();
@@ -2542,12 +2553,6 @@
         maxScrollY = Math.max(1, document.documentElement.scrollHeight - innerHeight);
       }
 
-      mainVideo.addEventListener('seeking', () => {
-        // Setting currentTime during startup/reset also emits `seeking`, but
-        // it is not a queued scrub request. Do not let that event permanently
-        // lock the pointer/scroll seek queue.
-        if (pendingSeekTime !== null || seekInFlight) seekInFlight = true;
-      });
       mainVideo.addEventListener('seeked', () => {
         if (typeof mainVideo.requestVideoFrameCallback !== 'function') {
           finishVideoSeek(seekSequence);
