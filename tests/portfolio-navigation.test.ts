@@ -145,6 +145,11 @@ describe("portfolio page navigation", () => {
     dom.window.close();
   });
 
+  it("uses the compressed texture for portfolio page backgrounds", () => {
+    expect(html).not.toContain('url("resume-texture.png")');
+    expect(html).toContain('url("resume-texture.webp")');
+  });
+
   it("keeps the touch-device resume timeline in natural document flow", () => {
     const { dom } = mountPortfolio({ coarsePointer: true });
 
