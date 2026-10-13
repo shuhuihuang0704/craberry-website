@@ -94,10 +94,11 @@
     .page-loop-home .story-copy[data-copy="0"] { opacity: 1 !important; transform: translate3d(0, 0, 0) !important; }
     .page-loop-home .story-copy[data-copy="1"], .page-loop-home .story-copy[data-copy="2"] { opacity: 0 !important; transform: translate3d(0, 24px, 0) !important; }
     .portfolio-page.is-transition-covered { visibility: hidden; }
-    .portfolio-page[data-page="1"] { background-image: url("page-1.jpg"); }
+    .portfolio-page[data-page="1"] { background-image: url("page-1-preview.webp"); }
     .resume-feature { min-height: 100dvh; height: 100dvh; overflow: hidden; background-image: none !important; background-color: #4b4839; place-items: start; align-content: start; padding-top: 10vh; }
-    .resume-feature-photo { position: absolute; inset: 0 0 auto; z-index: -2; height: 100dvh; overflow: hidden; }
-    .resume-feature-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .resume-feature-photo { position: absolute; inset: 0 0 auto; z-index: -2; height: 100dvh; overflow: hidden; background: #4b4839 url("page-1-preview.webp") center 38% / cover no-repeat; }
+    .resume-feature-photo picture { display: block; width: 100%; height: 100%; }
+    .resume-feature-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 38%; }
     .resume-feature::after { background: linear-gradient(90deg, rgba(29, 28, 21, .62) 0%, rgba(29, 28, 21, .18) 46%, rgba(29, 28, 21, .04) 72%), linear-gradient(180deg, rgba(18, 22, 17, .12), rgba(18, 22, 17, .48)); }
     .resume-feature-copy { position: relative; z-index: 1; display: flex; flex-direction: column; width: min(1180px, 92vw); height: 82vh; max-height: calc(100dvh - 6vh); padding-right: 18px; color: #f4ead4; opacity: 1; transform: translateY(-6vh); transition: opacity .55s ease, transform .7s cubic-bezier(.22,1,.36,1); }
     .resume-feature.is-transition-exiting .resume-feature-copy { opacity: 0; transform: translate3d(-1.8vw, -6vh, 0) scale(.96); }
@@ -130,7 +131,7 @@
     .resume-timeline.is-wheel article { position: absolute; top: 50%; left: 0; width: calc(100% - 18px); margin: 0; padding: 14px 20px 20px 24px; opacity: var(--wheel-opacity, 0); transform: translate3d(var(--wheel-x, 0px), calc(-50% + var(--wheel-y, 0px)), 0) rotate(var(--wheel-rotate, 0deg)) scale(var(--wheel-scale, .82)); z-index: var(--wheel-z, 1); border: 1px solid rgba(244, 234, 212, .18); border-radius: 12px; background: transparent; box-shadow: 0 8px 20px rgba(8, 11, 7, .22); will-change: transform, opacity, filter; animation: none !important; transition: none; pointer-events: auto; cursor: pointer; }
     .resume-timeline.is-wheel article::before { top: 22px; }
     .resume-timeline.is-wheel article.is-wheel-active { --wheel-scale: 1; --wheel-opacity: 1; }
-    .resume-study { display: block; min-height: 100dvh; height: 100dvh; padding: clamp(54px, 9vh, 110px) clamp(26px, 7vw, 110px); background-color: #4b4839; background-image: url("resume-texture.png") !important; background-position: center !important; background-size: cover !important; background-repeat: no-repeat !important; }
+    .resume-study { display: block; min-height: 100dvh; height: 100dvh; padding: clamp(54px, 9vh, 110px) clamp(26px, 7vw, 110px); background-color: #4b4839; background-image: url("resume-texture.webp") !important; background-position: center !important; background-size: cover !important; background-repeat: no-repeat !important; }
     .resume-study::after { background: transparent; }
     .resume-study-corner-note { position: absolute; top: clamp(24px, 4vh, 48px); left: clamp(24px, 4vw, 60px); z-index: 3; display: grid; gap: 5px; color: rgba(244, 234, 212, .82); pointer-events: none; }
     .resume-study-corner-note small { color: #c4d47d; font-size: 10px; font-weight: 800; letter-spacing: .2em; }
@@ -163,6 +164,7 @@
     .resume-study-facts strong { display: block; margin-bottom: 5px; color: #c4d47d; font-size: 11px; letter-spacing: .14em; }
     .resume-study-facts span { color: rgba(244, 234, 212, .82); font-size: 13px; line-height: 1.6; }
     .resume-study-photo { position: absolute; right: clamp(-150px, -5vw, -36px); bottom: -4%; z-index: 1; width: min(70vw, 1140px); pointer-events: none; }
+    .resume-study-photo picture { display: block; width: 100%; }
     .resume-study-photo img { display: block; width: 100%; height: auto; object-fit: contain; filter: none; }
 
     @keyframes portfolio-folder-bounce {
@@ -179,6 +181,7 @@
     }
 
     .resume-study-folder { position: absolute; top: auto; bottom: 0; left: 50%; z-index: 2; width: min(68vw, 1040px); aspect-ratio: 800 / 341; perspective: 1100px; cursor: grab; transform: translateX(-50%); }
+    .resume-study-folder > picture { position: absolute; inset: 0; display: block; }
     .resume-study-folder img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border-radius: 14px; object-fit: contain; box-shadow: 0 24px 34px rgba(35, 27, 17, .34), 0 7px 0 rgba(255, 236, 197, .16); transform: rotateZ(-2deg) rotateY(-2deg); transform-origin: 50% 82%; transition: opacity .55s ease, transform .45s cubic-bezier(.22,1,.36,1), filter .45s ease; }
     .resume-study-folder-open { opacity: 0; }
     .resume-study-folder-initial { transform: translateY(-clamp(18px, 3vh, 36px)) rotateZ(-2deg) rotateY(-2deg); }
@@ -475,11 +478,12 @@
     .page-transition.is-playing { opacity: 1; visibility: visible; pointer-events: auto; transform: none; transition-delay: 0s; }
     .page-transition.is-closing { opacity: 0; visibility: hidden; pointer-events: none; transition: none; }
     .page-transition-background { position: absolute; inset: 0; z-index: 0; opacity: 0; background-position: center; background-size: cover; background-repeat: no-repeat; pointer-events: none; transition: opacity .3s ease; }
-    #pageTransitionComputerBackground { background-color: #4b4839; background-image: url("resume-texture.png"); }
-    #pageTransitionFallingBackground { background-color: #4b4839; background-image: url("falling-wall-background.png"); }
+    #pageTransitionComputerBackground { background-color: #4b4839; background-image: url("resume-texture.webp"); }
+    #pageTransitionFallingBackground { background-color: #4b4839; background-image: url("falling-wall-background.webp"); }
     .page-transition video { position: relative; z-index: 1; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: none; transform-origin: 50% 50%; will-change: opacity; transition: opacity .35s ease; }
     .page-transition.is-playing video { opacity: var(--transition-video-opacity, 1); transform: none; }
     .page-transition-character-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; transform: translate3d(var(--transition-x, 0vw), var(--transition-y, 0vh), 0) scale(var(--transition-scale, 1)); transform-origin: 50% 50%; transform-style: preserve-3d; backface-visibility: hidden; will-change: transform; transition: none; }
+    .page-transition-character-layer > picture { position: absolute; inset: 0; display: block; }
     .page-transition-character-layer img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .3s ease; }
 
     html[data-layer="main"] #mainVideo,
@@ -1246,6 +1250,27 @@
         max-height: none;
         padding: 0 8px 8px 20px;
       }
+      .resume-timeline:not(.is-wheel) {
+        display: grid;
+        grid-auto-flow: row;
+        gap: 14px;
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+        padding: 0 4px 0 20px;
+      }
+      .resume-timeline:not(.is-wheel) article {
+        position: relative;
+        width: 100%;
+        padding: 0 0 12px;
+        opacity: 1;
+        transform: none;
+        filter: none;
+        animation: none !important;
+        border-bottom: 1px solid rgba(244, 234, 212, .16);
+      }
+      .resume-timeline:not(.is-wheel) article::before { top: 10px; left: -20px; }
       .resume-timeline.is-wheel article {
         width: calc(100% - 4px);
         padding: 12px 12px 14px 18px;
@@ -1315,8 +1340,8 @@
 <body>
   <main id="top" class="experience" aria-label="滚动驱动的设计师作品集介绍">
     <div class="video-stage" aria-hidden="true">
-      <video id="mainVideo" class="video-layer" muted playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5-page" disablepictureinpicture preload="metadata" src="main-video.mp4"></video>
-      <video id="outroVideo" class="video-layer" loop muted playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5-page" disablepictureinpicture preload="metadata" src="main-video.mp4"></video>
+      <video id="mainVideo" class="video-layer" muted playsinline webkit-playsinline x5-video-player-type="h5-page" disablepictureinpicture preload="metadata" data-src="main-video.mp4" data-mobile-src="main-video-mobile.mp4"></video>
+      <video id="outroVideo" class="video-layer" loop muted playsinline webkit-playsinline x5-video-player-type="h5-page" disablepictureinpicture preload="metadata" data-src="main-video.mp4" data-mobile-src="main-video-mobile.mp4"></video>
     </div>
 
     <canvas id="glowCursor" class="glow-cursor-canvas" aria-hidden="true"></canvas>
@@ -1382,16 +1407,16 @@
   <div class="page-transition" aria-hidden="true">
     <div id="pageTransitionComputerBackground" class="page-transition-background" aria-hidden="true"></div>
     <div id="pageTransitionFallingBackground" class="page-transition-background" aria-hidden="true"></div>
-    <video id="pageTransitionVideo" muted playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5-page" disablepictureinpicture preload="none" data-src="custom-transition-web.mp4"></video>
+    <video id="pageTransitionVideo" muted playsinline webkit-playsinline x5-video-player-type="h5-page" disablepictureinpicture preload="none" data-src="custom-transition-web.mp4" data-mobile-src="custom-transition-mobile.mp4"></video>
     <div class="page-transition-character-layer" aria-hidden="true">
-      <img id="pageTransitionPerson" src="person-sofa-cutout.png" alt="">
-      <img id="pageTransitionFallingPerson" src="falling-foreground-cutout.png" alt="">
+      <picture><source type="image/webp" srcset="person-sofa-cutout.webp"><img id="pageTransitionPerson" src="person-sofa-cutout.png" alt=""></picture>
+      <picture><source type="image/webp" srcset="falling-foreground-cutout.webp"><img id="pageTransitionFallingPerson" src="falling-foreground-cutout.png" alt=""></picture>
     </div>
   </div>
 
   <div class="portfolio-pages" aria-label="作品页面">
     <section class="portfolio-page resume-feature" id="page-1" data-page="1" aria-label="个人履历">
-      <div class="resume-feature-photo" aria-hidden="true"><img src="page-1.jpg" alt=""></div>
+      <div class="resume-feature-photo" aria-hidden="true"><picture><source media="(max-width: 760px)" type="image/webp" srcset="page-1-mobile.webp"><source type="image/webp" srcset="page-1.webp"><img src="page-1.jpg" alt="" loading="lazy" decoding="async"></picture></div>
       <div class="resume-feature-copy">
         <span class="resume-feature-kicker">02 / Biography · 个人履历</span>
         <h2>DESIGN.<br><span>TEACH.</span><br>BUILD.</h2>
@@ -1426,10 +1451,10 @@
         <span>把灵感整理成作品，<br>让每一次尝试都被看见。</span>
       </div>
       <div class="resume-study-folder" tabindex="0" role="button" aria-label="打开作品集">
-        <img class="resume-study-folder-initial" src="folder-cutout.png" alt="Craberry Portfolio 3D 文件夹">
-        <img class="resume-study-folder-open" src="portfolio-bg-folder.png" alt="Portfolio-Bg 植物环绕的 3D 文件夹">
+        <picture><source type="image/webp" srcset="folder-cutout.webp"><img class="resume-study-folder-initial" src="folder-cutout.png" alt="Craberry Portfolio 3D 文件夹"></picture>
+        <picture><source type="image/webp" srcset="portfolio-bg-folder.webp"><img class="resume-study-folder-open" src="portfolio-bg-folder.png" alt="Portfolio-Bg 植物环绕的 3D 文件夹"></picture>
       </div>
-      <div class="resume-study-photo" aria-hidden="true"><img src="person-sofa-cutout.png" alt=""></div>
+      <div class="resume-study-photo" aria-hidden="true"><picture><source type="image/webp" srcset="person-sofa-cutout.webp"><img src="person-sofa-cutout.png" alt=""></picture></div>
       <div class="resume-study-intro" aria-label="作品集说明">
         <small>PORTFOLIO / SELECTED WORK</small>
         <h2>MAKE <span>IDEAS</span><br>VISIBLE.</h2>
@@ -1995,7 +2020,9 @@
 
       let pageTransitionVideoLoadPromise = null;
       function ensurePageTransitionVideoLoaded() {
-        const source = pageTransitionVideo.dataset.src;
+        const source = coarsePointer.matches
+          ? (pageTransitionVideo.dataset.mobileSrc || pageTransitionVideo.dataset.src)
+          : pageTransitionVideo.dataset.src;
         if (!source) return Promise.reject(new Error('Transition video source is missing.'));
         if (pageTransitionVideo.readyState >= 1 && pageTransitionVideo.currentSrc.endsWith(source)) {
           return Promise.resolve();
@@ -2742,13 +2769,21 @@
         scheduleRender();
       }
 
-      allVideos.forEach((video, index) => {
+      allVideos.forEach((video) => {
         video.addEventListener('loadedmetadata', () => {
           if (video === mainVideo) homeDuration = Number.isFinite(video.duration) ? video.duration : homeDuration;
           else segmentDurations[0] = Number.isFinite(video.duration) ? video.duration : segmentDurations[0];
           metadataCount += 1;
           configureVideo();
         }, { once: true });
+      });
+      allVideos.forEach(video => {
+        const source = coarsePointer.matches
+          ? (video.dataset.mobileSrc || video.dataset.src)
+          : video.dataset.src;
+        if (!source) return;
+        video.src = source;
+        video.load();
       });
       mainVideo.addEventListener('loadedmetadata', () => {
         if (pendingSeekTime !== null) flushVideoSeek();
@@ -2825,7 +2860,7 @@
       // OptionWheel-style timeline: one rAF loop eases the selected experience
       // along a looping curved rail; wheel, drag, arrows and clicks all share the same target.
       const timelineWheel = document.querySelector('.resume-timeline');
-      if (timelineWheel) {
+      if (timelineWheel && !coarsePointer.matches) {
         const timelineItems = [...timelineWheel.querySelectorAll('article')];
         const wheelState = { position: 0, target: 0, raf: 0, drag: null, wheelTimer: 0, last: performance.now() };
         timelineWheel.classList.add('is-wheel');

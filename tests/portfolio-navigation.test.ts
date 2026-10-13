@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 // @ts-expect-error jsdom v26 has no bundled TypeScript declarations in this project.
 import { JSDOM } from "jsdom";
@@ -72,7 +72,7 @@ function mountPortfolio(options: { coarsePointer?: boolean; transitionLoad?: Tra
         if (this.id !== "pageTransitionVideo" || transitionLoad !== "metadata") return;
         const media = this as HTMLMediaElement & { testReadyState?: number; testCurrentSrc?: string };
         media.testReadyState = 1;
-        media.testCurrentSrc = "https://portfolio.test/custom-transition-web.mp4";
+        media.testCurrentSrc = this.src;
         window.setTimeout(() => this.dispatchEvent(new window.Event("loadedmetadata")), 0);
       };
     },
@@ -104,6 +104,61 @@ afterEach(() => {
 });
 
 describe("portfolio page navigation", () => {
+  it("keeps touch-device videos on the standard inline playback path", () => {
+    const { dom } = mountPortfolio({ coarsePointer: true });
+    const videos = [...dom.window.document.querySelectorAll("video")];
+
+    expect(videos.length).toBeGreaterThan(0);
+    expect(videos.every(video => video.hasAttribute("playsinline"))).toBe(true);
+    expect(videos.some(video => video.hasAttribute("x5-playsinline"))).toBe(false);
+    dom.window.close();
+  });
+
+  it("selects compact hero videos on touch devices", () => {
+    const { dom } = mountPortfolio({ coarsePointer: true });
+
+    expect(dom.window.document.getElementById("mainVideo")?.getAttribute("src")).toBe("main-video-mobile.mp4");
+    expect(dom.window.document.getElementById("outroVideo")?.getAttribute("src")).toBe("main-video-mobile.mp4");
+    expect(statSync(resolve(process.cwd(), "main-video-mobile.mp4")).size).toBeLessThan(500_000);
+    dom.window.close();
+  });
+
+  it("loads a compact transition clip when a touch user advances pages", async () => {
+    vi.useFakeTimers();
+    const { dom, setScrollY } = mountPortfolio({ coarsePointer: true, transitionLoad: "metadata" });
+    setScrollY(800);
+
+    (dom.window.document.querySelector("#page-1 .page-next") as HTMLAnchorElement).click();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(dom.window.document.getElementById("pageTransitionVideo")?.getAttribute("src")).toBe("custom-transition-mobile.mp4");
+    expect(statSync(resolve(process.cwd(), "custom-transition-mobile.mp4")).size).toBeLessThan(1_000_000);
+    dom.window.close();
+  });
+
+  it("uses a compact portrait asset for the mobile biography background", () => {
+    const { dom } = mountPortfolio({ coarsePointer: true });
+    const mobilePortrait = dom.window.document.querySelector(".resume-feature-photo source[media]");
+
+    expect(mobilePortrait?.getAttribute("srcset")).toBe("page-1-mobile.webp");
+    expect(statSync(resolve(process.cwd(), "page-1-mobile.webp")).size).toBeLessThan(500_000);
+    dom.window.close();
+  });
+
+  it("keeps the touch-device resume timeline in natural document flow", () => {
+    const { dom } = mountPortfolio({ coarsePointer: true });
+
+    expect(dom.window.document.querySelector(".resume-timeline")?.classList.contains("is-wheel")).toBe(false);
+    dom.window.close();
+  });
+
+  it("retains the interactive timeline wheel on fine-pointer devices", () => {
+    const { dom } = mountPortfolio({ coarsePointer: false });
+
+    expect(dom.window.document.querySelector(".resume-timeline")?.classList.contains("is-wheel")).toBe(true);
+    dom.window.close();
+  });
+
   it("restarts the touch-device home video when the Ending return button is used", () => {
     const { dom, setScrollY, heroPlayCalls } = mountPortfolio({ coarsePointer: true });
     const { document } = dom.window;
