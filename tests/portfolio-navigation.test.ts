@@ -11,6 +11,7 @@ type TransitionLoad = "stall" | "metadata";
 function mountPortfolio(options: { coarsePointer?: boolean; transitionLoad?: TransitionLoad } = {}) {
   let scrollY = 0;
   let heroPlayCalls = 0;
+  const openedUrls: string[] = [];
   const coarsePointer = options.coarsePointer ?? false;
   const transitionLoad = options.transitionLoad ?? "stall";
   const dom = new JSDOM(html, {
@@ -48,6 +49,10 @@ function mountPortfolio(options: { coarsePointer?: boolean; transitionLoad?: Tra
         dispatchEvent: () => false,
       })) as typeof window.matchMedia;
       window.fetch = (() => Promise.resolve({ ok: false, json: async () => [] } as Response)) as typeof window.fetch;
+      window.open = ((url?: string | URL) => {
+        openedUrls.push(String(url || ""));
+        return null;
+      }) as typeof window.open;
       window.HTMLCanvasElement.prototype.getContext = (() => null) as typeof window.HTMLCanvasElement.prototype.getContext;
 
       Object.defineProperty(window.HTMLMediaElement.prototype, "readyState", {
@@ -96,6 +101,7 @@ function mountPortfolio(options: { coarsePointer?: boolean; transitionLoad?: Tra
     dom,
     setScrollY: (value: number) => { scrollY = value; },
     heroPlayCalls: () => heroPlayCalls,
+    openedUrls: () => openedUrls,
   };
 }
 
@@ -123,7 +129,7 @@ describe("portfolio page navigation", () => {
     dom.window.close();
   });
 
-  it("loads a compact transition clip when a touch user advances pages", async () => {
+  it("uses the same transition video on touch devices as on desktop", async () => {
     vi.useFakeTimers();
     const { dom, setScrollY } = mountPortfolio({ coarsePointer: true, transitionLoad: "metadata" });
     setScrollY(800);
@@ -131,8 +137,37 @@ describe("portfolio page navigation", () => {
     (dom.window.document.querySelector("#page-1 .page-next") as HTMLAnchorElement).click();
     await vi.advanceTimersByTimeAsync(0);
 
-    expect(dom.window.document.getElementById("pageTransitionVideo")?.getAttribute("src")).toBe("custom-transition-mobile.mp4");
-    expect(statSync(resolve(process.cwd(), "custom-transition-mobile.mp4")).size).toBeLessThan(1_000_000);
+    expect(dom.window.document.getElementById("pageTransitionVideo")?.getAttribute("src")).toBe("custom-transition-web.mp4");
+    dom.window.close();
+  });
+
+  it("makes the closed project gallery inert and prevents hidden tiles opening GitHub", async () => {
+    vi.useFakeTimers();
+    const { dom, openedUrls } = mountPortfolio({ coarsePointer: true });
+    const { document, Event } = dom.window;
+
+    (document.querySelector(".resume-study-folder") as HTMLElement).click();
+    (document.querySelector(".portfolio-card-hit--app") as HTMLElement).click();
+    await vi.advanceTimersByTimeAsync(250);
+
+    const gallery = document.querySelector(".github-gallery-page") as HTMLElement;
+    const tile = document.querySelector(".github-gallery-tile") as HTMLElement;
+    expect(gallery.getAttribute("aria-hidden")).toBe("false");
+    expect(tile).toBeTruthy();
+    (document.querySelector(".github-gallery-close") as HTMLButtonElement).click();
+
+    const dispatchPointer = (type: string) => {
+      const event = new Event(type, { bubbles: true });
+      Object.assign(event, { pointerId: 7, clientX: 100, button: 0, pointerType: "touch" });
+      tile.dispatchEvent(event);
+    };
+    dispatchPointer("pointerdown");
+    dispatchPointer("pointerup");
+
+    expect(gallery.hasAttribute("inert")).toBe(true);
+    expect(tile.style.pointerEvents).toBe("none");
+    expect(gallery.getAttribute("aria-hidden")).toBe("true");
+    expect(openedUrls()).toEqual([]);
     dom.window.close();
   });
 

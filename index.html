@@ -1407,7 +1407,7 @@
   <div class="page-transition" aria-hidden="true">
     <div id="pageTransitionComputerBackground" class="page-transition-background" aria-hidden="true"></div>
     <div id="pageTransitionFallingBackground" class="page-transition-background" aria-hidden="true"></div>
-    <video id="pageTransitionVideo" muted playsinline webkit-playsinline x5-video-player-type="h5-page" disablepictureinpicture preload="none" data-src="custom-transition-web.mp4" data-mobile-src="custom-transition-mobile.mp4"></video>
+    <video id="pageTransitionVideo" muted playsinline webkit-playsinline x5-video-player-type="h5-page" disablepictureinpicture preload="none" data-src="custom-transition-web.mp4"></video>
     <div class="page-transition-character-layer" aria-hidden="true">
       <picture><source type="image/webp" srcset="person-sofa-cutout.webp"><img id="pageTransitionPerson" src="person-sofa-cutout.png" alt=""></picture>
       <picture><source type="image/webp" srcset="falling-foreground-cutout.webp"><img id="pageTransitionFallingPerson" src="falling-foreground-cutout.png" alt=""></picture>
@@ -1516,7 +1516,7 @@
         </span>
         </div>
       </div>
-      <div class="github-gallery-page" aria-hidden="true">
+      <div class="github-gallery-page" aria-hidden="true" inert>
         <button class="github-gallery-close" type="button" aria-label="返回作品卡片">×</button>
         <header class="github-gallery-head">
           <small data-gallery-kicker>GITHUB / PROJECTS</small>
@@ -2020,9 +2020,7 @@
 
       let pageTransitionVideoLoadPromise = null;
       function ensurePageTransitionVideoLoaded() {
-        const source = coarsePointer.matches
-          ? (pageTransitionVideo.dataset.mobileSrc || pageTransitionVideo.dataset.src)
-          : pageTransitionVideo.dataset.src;
+        const source = pageTransitionVideo.dataset.src;
         if (!source) return Promise.reject(new Error('Transition video source is missing.'));
         if (pageTransitionVideo.readyState >= 1 && pageTransitionVideo.currentSrc.endsWith(source)) {
           return Promise.resolve();
@@ -3133,7 +3131,8 @@
             tile.style.transform = `translate(-50%, -50%) translate3d(${(distance * sideGap).toFixed(1)}px, 0, ${(90 - depth * 92).toFixed(1)}px) rotateY(${(-direction * Math.min(48, depth * 34)).toFixed(2)}deg) scale(${scale.toFixed(3)})`;
             tile.style.opacity = opacity.toFixed(3);
             tile.style.filter = `blur(${(depth * 1.1).toFixed(2)}px) saturate(${(1 - depth * .12).toFixed(2)})`;
-            tile.style.pointerEvents = depth < 1.45 ? 'auto' : 'none';
+            const galleryIsInteractive = resumeStudy.classList.contains('is-gallery-open') && !galleryPage.hasAttribute('inert');
+            tile.style.pointerEvents = galleryIsInteractive && depth < 1.45 ? 'auto' : 'none';
             tile.style.zIndex = String(Math.round(200 - depth * 20));
             tile.classList.toggle('is-current', Math.abs(distance) < .18);
           });
@@ -3194,6 +3193,7 @@
           galleryStatus.textContent = '正在读取仓库 README 图片…';
           resumeStudy.classList.add('is-gallery-open');
           document.body.classList.add('is-gallery-open');
+          galleryPage.removeAttribute('inert');
           galleryPage.setAttribute('aria-hidden', 'false');
           renderGithubGallery(category);
         };
@@ -3201,14 +3201,20 @@
           resumeStudy.classList.remove('is-gallery-open');
           document.body.classList.remove('is-gallery-open');
           galleryPage?.setAttribute('aria-hidden', 'true');
+          galleryPage?.setAttribute('inert', '');
+          galleryDrag = null;
+          galleryTrack?.classList.remove('is-dragging');
+          updateCircularCarousel();
         };
         galleryPage?.querySelector('.github-gallery-close')?.addEventListener('click', closeGithubGallery);
         const openGithubRepo = tile => {
+          if (!resumeStudy.classList.contains('is-gallery-open') || galleryPage?.hasAttribute('inert')) return;
           const repoUrl = tile?.dataset.repoUrl;
           if (repoUrl) window.open(repoUrl, '_blank', 'noopener,noreferrer');
         };
         let galleryDrag = null;
         galleryTrack?.addEventListener('pointerdown', event => {
+          if (!resumeStudy.classList.contains('is-gallery-open') || galleryPage?.hasAttribute('inert')) return;
           if (event.target.closest('a, button, input, select, textarea')) return;
           galleryDrag = { id: event.pointerId, x: event.clientX, startX: event.clientX, moved: false, tile: event.target.closest('.github-gallery-tile') };
           galleryTrack.setPointerCapture?.(event.pointerId);
@@ -3241,6 +3247,7 @@
           nudgeCarousel((Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX) / 420);
         }, { passive: false });
         galleryTrack?.addEventListener('keydown', event => {
+          if (!resumeStudy.classList.contains('is-gallery-open') || galleryPage?.hasAttribute('inert')) return;
           const tile = event.target.closest?.('.github-gallery-tile');
           if ((event.key === 'Enter' || event.key === ' ') && tile) {
             event.preventDefault();
